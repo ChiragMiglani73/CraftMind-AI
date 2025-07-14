@@ -39,7 +39,6 @@ Welcome to the **AI SaaS App**, a fully functional Software-as-a-Service platfor
 - **Backend**: Node.js + Express  
 - **Database**: PostgreSQL (via Neon)  
 - **Authentication**: Clerk  
-- **Payments**: Stripe  
 - **AI Integrations**: OpenAI, Replicate, etc.
 
 ---
