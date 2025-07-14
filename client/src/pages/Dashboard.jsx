@@ -61,16 +61,24 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {loading ? (
-        <div className='flex justify-center items-center h-3/4'>
-          <div className='animate-spin rounded-full h-11 w-11 border-3 border-purple-500 border-t-transparent'></div>
-        </div>
-      ) : (
-        <div className='space-y-3'>
-          <p className='mt-6 mb-4 text-gray-300'>Recent Creations</p>
-          {creations.map((item) => <CreationItem key={item.id} item={item} />)}
-        </div>
-      )}
+     {loading ? (
+  <div className='flex justify-center items-center h-3/4'>
+    <div className='animate-spin rounded-full h-11 w-11 border-3 border-purple-500 border-t-transparent'></div>
+  </div>
+) : (
+  <div className='space-y-3'>
+    <p className='mt-6 mb-4 text-gray-300'>Recent Creations</p>
+    {creations.map((item) => (
+      <div
+        key={item.id}
+        className="bg-[#1c1c2e] text-white p-4 rounded-lg border border-gray-700"
+      >
+        <CreationItem item={item} />
+      </div>
+    ))}
+  </div>
+)}
+
     </div>
   )
 }
