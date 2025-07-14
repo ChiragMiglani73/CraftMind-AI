@@ -1,8 +1,8 @@
 # ⚡ AI SaaS Platform – Powered by PERN Stack
 
+Welcome to the **AI SaaS App**, a fully functional Software-as-a-Service platform with subscription billing built using the powerful **PERN Stack** (PostgreSQL, Express, React, Node.js). This app includes seamless **user authentication**, intelligent **AI-powered tools**, and **subscription management** to monetize premium features.
 
-Welcome to the **AI SaaS App**, a fully functional Software-as-a-Service platform with subscription billing built using the powerful **PERN Stack** (PostgreSQL, Express, React, Node.js), featuring seamless **user authentication**, **AI-powered tools**, and **subscription management**.
-
+---
 
 ## ✨ Key Features
 
@@ -10,35 +10,36 @@ Welcome to the **AI SaaS App**, a fully functional Software-as-a-Service platfor
   Powered by [Clerk](https://clerk.dev) for secure Sign In / Sign Up / Profile Management.
 
 - 💳 **Subscription Billing**  
-  Easily manage free and premium plans with built-in payment system integration.
+  Manage free and premium plans using Stripe or similar services.
 
-- 🧠 **AI-Powered Tools**  
-  Access to a suite of smart utilities, powered by modern AI APIs and models.
+- 🧠 **AI Tools**  
+  A collection of powerful tools powered by OpenAI, Replicate, and more.
 
-- 🗃️ **Database**  
-  Serverless PostgreSQL provided by [Neon](https://neon.tech), fast and scalable.
+- 🗃️ **Serverless Database**  
+  Built on [Neon](https://neon.tech), offering scalable and fast PostgreSQL storage.
 
 ---
 
 ## 🧩 AI Tools Included
 
-| Feature                 | Description |
-|------------------------|-------------|
-| 📝 **Article Generator** | Input a title and length to generate SEO-friendly content. |
-| 📰 **Blog Title Generator** | Generate catchy blog titles by entering a keyword & category. |
-| 🖼️ **Image Generator** | Generate custom AI images from any text prompt. |
-| 🧼 **Background Remover** | Upload any image and get a transparent background version. |
-| 🧽 **Image Object Remover** | Remove unwanted objects by uploading the image and describing the object. |
-| 📄 **Resume Analyzer** | Upload your resume and get detailed AI-driven insights and suggestions. |
+| Feature                   | Description |
+|--------------------------|-------------|
+| 📝 **Article Generator**        | Input a title and length to generate SEO-friendly content. |
+| 📰 **Blog Title Generator**     | Generate catchy blog titles by entering a keyword & category. |
+| 🖼️ **Image Generator**         | Create AI-generated images using custom text prompts. |
+| 🧼 **Background Remover**      | Upload an image and receive a transparent background version. |
+| 🧽 **Image Object Remover**    | Remove unwanted objects by uploading an image and describing the item. |
+| 📄 **Resume Analyzer**         | Upload your resume to receive a full AI-powered analysis. |
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React + TailwindCSS  
+- **Frontend**: React + Tailwind CSS  
 - **Backend**: Node.js + Express  
 - **Database**: PostgreSQL (via Neon)  
-- **Auth**: Clerk  
-- **AI Services**: OpenAI, Replicate, etc.
+- **Authentication**: Clerk  
+- **Payments**: Stripe  
+- **AI Integrations**: OpenAI, Replicate, etc.
 
 ---
