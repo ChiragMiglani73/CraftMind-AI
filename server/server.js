@@ -11,11 +11,8 @@ const app = express();
 await connectCloudinary();
 
 // Setup CORS before anything else
-app.use(cors({
-  origin: 'https://craft-mind-ai.vercel.app',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  credentials: true
-}));
+app.use(cors()); // allow all origins
+
 
 app.use(express.json());
 app.use(clerkMiddleware());
@@ -26,7 +23,8 @@ app.get('/', (req, res) => res.send('Server is Live!'));
 // Allow preflight requests to pass before requiring auth
 app.options('*', cors());
 
-
+// Secure routes
+app.use(requireAuth());
 
 app.use('/api/ai', aiRouter);
 app.use('/api/user', userRouter);
