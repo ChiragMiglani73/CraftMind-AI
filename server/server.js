@@ -26,8 +26,7 @@ app.get('/', (req, res) => res.send('Server is Live!'));
 // Allow preflight requests to pass before requiring auth
 app.options('*', cors());
 
-// Secure routes
-app.use(requireAuth());
+
 
 app.use('/api/ai', aiRouter);
 app.use('/api/user', userRouter);
