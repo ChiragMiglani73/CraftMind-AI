@@ -1,4 +1,3 @@
-import OpenAI from "openai";
 import sql from "../configs/db.js";
 import { clerkClient } from "@clerk/express";
 import axios from "axios";
@@ -6,95 +5,91 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from 'fs'
 import pdf from 'pdf-parse/lib/pdf-parse.js'
 
-const AI = new OpenAI({
-    apiKey: process.env.GEMINI_API_KEY,
-    baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+const geminiFlash = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
 });
 
-export const generateArticle = async (req, res)=>{
-    try {
-        const { userId } = req.auth();
-        const { prompt, length } = req.body;
-        const plan = req.plan;
-        const free_usage = req.free_usage;
+export const generateArticle = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { prompt, length } = req.body;
+    const plan = req.plan;
+    const free_usage = req.free_usage;
 
-        if(plan !== 'premium' && free_usage >= 10){
-            return res.json({ success: false, message: "Limit reached. Upgrade to continue."})
-        }
-
-        const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
-            messages: [{
-                    role: "user",
-                    content: prompt,
-                },
-            ],
-            temperature: 0.7,
-            max_tokens: length,
-        });
-
-        const content = response.choices[0].message.content
-
-        await sql` INSERT INTO creations (user_id, prompt, content, type) 
-        VALUES (${userId}, ${prompt}, ${content}, 'article')`;
-
-        if(plan !== 'premium'){
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata:{
-                    free_usage: free_usage + 1
-                }
-            })
-        }
-
-        res.json({ success: true, content})
-
-
-    } catch (error) {
-        console.log(error.message)
-        res.json({success: false, message: error.message})
+    if (plan !== "premium" && free_usage >= 10) {
+      return res.json({ success: false, message: "Limit reached. Upgrade to continue." });
     }
-}
 
-export const generateBlogTitle = async (req, res)=>{
-    try {
-        const { userId } = req.auth();
-        const { prompt } = req.body;
-        const plan = req.plan;
-        const free_usage = req.free_usage;
+    const result = await geminiFlash.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: length,
+      },
+    });
 
-        if(plan !== 'premium' && free_usage >= 10){
-            return res.json({ success: false, message: "Limit reached. Upgrade to continue."})
-        }
+    const content = result.response.text();
 
-        const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
-            messages: [{ role: "user", content: prompt, } ],
-            temperature: 0.7,
-            max_tokens: 100,
-        });
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type)
+      VALUES (${userId}, ${prompt}, ${content}, 'article')
+    `;
 
-        const content = response.choices[0].message.content
-
-        await sql` INSERT INTO creations (user_id, prompt, content, type) 
-        VALUES (${userId}, ${prompt}, ${content}, 'blog-title')`;
-
-        if(plan !== 'premium'){
-            await clerkClient.users.updateUserMetadata(userId, {
-                privateMetadata:{
-                    free_usage: free_usage + 1
-                }
-            })
-        }
-
-        res.json({ success: true, content})
-
-
-    } catch (error) {
-        console.log(error.message)
-        res.json({success: false, message: error.message})
+    if (plan !== "premium") {
+      await clerkClient.users.updateUserMetadata(userId, {
+        privateMetadata: { free_usage: free_usage + 1 },
+      });
     }
-}
 
+    res.json({ success: true, content });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: "Article generation failed" });
+  }
+};
+
+export const generateBlogTitle = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { prompt } = req.body;
+    const plan = req.plan;
+    const free_usage = req.free_usage;
+
+    if (plan !== "premium" && free_usage >= 10) {
+      return res.json({ success: false, message: "Limit reached. Upgrade to continue." });
+    }
+
+    const result = await geminiFlash.generateContent({
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 100,
+      },
+    });
+
+    const content = result.response.text();
+
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type)
+      VALUES (${userId}, ${prompt}, ${content}, 'blog-title')
+    `;
+
+    if (plan !== "premium") {
+      await clerkClient.users.updateUserMetadata(userId, {
+        privateMetadata: { free_usage: free_usage + 1 },
+      });
+    }
+
+    res.json({ success: true, content });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: "Blog title generation failed" });
+  }
+};
 
 export const generateImage = async (req, res)=>{
     try {
@@ -188,42 +183,36 @@ export const removeImageObject = async (req, res)=>{
         res.json({success: false, message: error.message})
     }
 }
+const geminiPro = genAI.getGenerativeModel({
+  model: "gemini-1.5-pro",
+});
 
-export const resumeReview = async (req, res)=>{
-    try {
-        const { userId } = req.auth();
-        const resume = req.file;
-        const plan = req.plan;
+export const resumeReview = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const resume = req.file;
+    const plan = req.plan;
 
-        if(plan !== 'premium'){
-            return res.json({ success: false, message: "This feature is only available for premium subscriptions"})
-        }
-
-        if(resume.size > 5 * 1024 * 1024){
-            return res.json({success: false, message: "Resume file size exceeds allowed size (5MB)."})
-        }
-
-        const dataBuffer = fs.readFileSync(resume.path)
-        const pdfData = await pdf(dataBuffer)
-
-        const prompt = `Review the following resume and provide constructive feedback on its strengths, weaknesses, and areas for improvement. Resume Content:\n\n${pdfData.text}`
-
-       const response = await AI.chat.completions.create({
-            model: "gemini-2.0-flash",
-            messages: [{ role: "user", content: prompt, } ],
-            temperature: 0.7,
-            max_tokens: 1000,
-        });
-
-        const content = response.choices[0].message.content
-
-        await sql` INSERT INTO creations (user_id, prompt, content, type) 
-        VALUES (${userId}, 'Review the uploaded resume', ${content}, 'resume-review')`;
-
-        res.json({ success: true, content})
-
-    } catch (error) {
-        console.log(error.message)
-        res.json({success: false, message: error.message})
+    if (plan !== "premium") {
+      return res.json({ success: false, message: "Premium only feature" });
     }
-}
+
+    const dataBuffer = fs.readFileSync(resume.path);
+    const pdfData = await pdf(dataBuffer);
+
+    const prompt = `Review this resume and give detailed feedback:\n\n${pdfData.text}`;
+
+    const result = await geminiPro.generateContent(prompt);
+    const content = result.response.text();
+
+    await sql`
+      INSERT INTO creations (user_id, prompt, content, type)
+      VALUES (${userId}, 'Resume review', ${content}, 'resume-review')
+    `;
+
+    res.json({ success: true, content });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: "Resume review failed" });
+  }
+};

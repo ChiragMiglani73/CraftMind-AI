@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@clerk/express": "^1.7.4",
+    "@google/generative-ai": "^0.24.1",
     "@neondatabase/serverless": "^1.0.1",
     "axios": "^1.10.0",
     "cloudinary": "^2.7.0",
@@ -30,4 +31,3 @@
     "nodemon": "^3.1.10"
   }
 }
-
