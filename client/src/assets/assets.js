@@ -1,4 +1,4 @@
-import logo from "./logo1.png";
+import logo from "./logo.png";
 import user_group from "./user_group.png";
 import star_icon from "./star_icon.svg";
 import star_dull_icon from "./star_dull_icon.svg";
